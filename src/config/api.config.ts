@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_URL || "/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "/api/v1",
   timeoutMs: 30_000,
   tokenStorageKey: "apea-access-token",
   refreshTokenStorageKey: "apea-refresh-token",
