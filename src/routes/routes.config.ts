@@ -10,6 +10,7 @@ export interface RouteDef {
 }
 
 export const ROUTES: RouteDef[] = [
+  { path: "/", component: lazy(() => import("@/pages/LandingPage")), label: "Home", public: true },
   { path: "/login", component: lazy(() => import("@/pages/Login")), label: "Login", public: true },
   { path: "/dashboard", component: lazy(() => import("@/pages/Dashboard")), label: "Dashboard" },
   { path: "/exceptions", component: lazy(() => import("@/pages/Exceptions")), label: "Exceptions" },

@@ -1,6 +1,6 @@
 import { Bell, LogOut, Menu, ShieldCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -11,6 +11,7 @@ import { APP_CONFIG } from "@/config/app.config";
 
 export function Header() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const toggle = useUiStore((s) => s.toggleSidebar);
   const unread = useQuery({
     queryKey: ["notifications", "unread"],
@@ -18,6 +19,11 @@ export function Header() {
     refetchInterval: 30_000,
     enabled: Boolean(user),
   });
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/", { replace: true });
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-border bg-surface/80 px-4 backdrop-blur">
@@ -60,12 +66,13 @@ export function Header() {
                 {user.role}
               </Badge> */}
             </div>
-            <Button variant="ghost" size="sm" onClick={() => logout()} leftIcon={<LogOut className="h-4 w-4" />}>
+            <Button variant="ghost" size="sm" onClick={handleLogout} leftIcon={<LogOut className="h-4 w-4" />}>
               <span className="hidden sm:inline">Sign out</span>
             </Button>
           </div>
         )}
       </div>
     </header>
+
   );
 }
