@@ -15,10 +15,10 @@ import { useUiStore } from "@/store/slices/ui";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/connectors", label: "Connectors", icon: PlugZap },
   { to: "/exceptions", label: "Exceptions", icon: AlertTriangle },
   { to: "/tickets", label: "Tickets", icon: Ticket },
   { to: "/rca", label: "Root Cause", icon: Brain },
+  { to: "/connectors", label: "Connectors", icon: PlugZap },
   { to: "/chatbot", label: "Assistant", icon: MessagesSquare },
   { to: "/reports", label: "Reports", icon: FileText },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
