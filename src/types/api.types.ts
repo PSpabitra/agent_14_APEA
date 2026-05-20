@@ -1,9 +1,11 @@
 import type { ConnectorName, DeviationStatus, Role, Severity } from "./common.types";
 
 export interface ApiEnvelope<T = unknown> {
-  ok: boolean;
+  ok?: boolean;
+  success?: boolean;
   data?: T;
   error?: { code?: string; message: string };
+  message?: string;
   meta?: Record<string, unknown>;
 }
 

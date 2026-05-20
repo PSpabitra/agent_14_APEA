@@ -22,7 +22,7 @@ import type {
 import type { ConnectorName, DeviationStatus, Severity } from "@/types/common.types";
 
 function unwrap<T>(env: ApiEnvelope<T>): T {
-  if (!env.ok) throw new Error(env.error?.message || "Request failed");
+  if (env.ok !== true && env.success !== true) throw new Error(env.error?.message || env.message || "Request failed");
   return env.data as T;
 }
 

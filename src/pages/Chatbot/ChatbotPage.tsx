@@ -228,7 +228,7 @@ export function ChatbotPage() {
             <Sparkles className="h-4 w-4 text-primary" /> Indexed documents
           </h4>
           <ul className="space-y-1.5 text-sm">
-            {(docs.data || []).map((d) => (
+            {(Array.isArray(docs.data) ? docs.data : []).map((d: any) => (
               <li key={d.id} className="flex items-center gap-2 text-text">
                 <FileText className="h-3.5 w-3.5 text-subtext" />
                 <span className="truncate">{d.filename}</span>

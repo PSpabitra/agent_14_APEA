@@ -6,7 +6,7 @@ import { ToastViewport } from "@/components/ui/Toast";
 
 export function AppShell() {
   return (
-    <div className="min-h-screen flex flex-col bg-bg text-text">
+    <div className="h-screen w-full flex flex-col bg-bg text-text overflow-hidden">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
