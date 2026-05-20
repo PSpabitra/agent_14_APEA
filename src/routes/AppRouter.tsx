@@ -1,43 +1,53 @@
-import React, { Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/Sidebar';
-import { Spinner } from '@/components/ui/shared';
+import { Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { ROUTES } from "./routes.config";
+import { PrivateRoute } from "./PrivateRoute";
+import { AppShell } from "@/components/layout/AppShell";
+import { NotFoundPage } from "@/pages/NotFound";
 
-// Lazy imports for code splitting
-const ExceptionDashboard  = React.lazy(() => import('@/pages/ExceptionDashboard/index'));
-const ExceptionsListPage  = React.lazy(() => import('@/pages/ExceptionDashboard/ExceptionsList'));
-const ExceptionDetailPage = React.lazy(() => import('@/pages/ExceptionDetail/index'));
-const TelemetryPage       = React.lazy(() => import('@/pages/TelemetryPage/index'));
-const PlaybooksPage       = React.lazy(() => import('@/pages/PlaybooksPage/index'));
-const CorrectiveActionsPage     = React.lazy(() => import('@/pages/CorrectiveActions/index'));
-const EscalationTimelinePage    = React.lazy(() => import('@/pages/EscalationTimeline/index'));
-const ConversationalOpsPage     = React.lazy(() => import('@/pages/ConversationalOps/index'));
-const ReportsPage               = React.lazy(() => import('@/pages/ReportsPage/index'));
+function PageFallback() {
+  return (
+    <div className="flex flex-1 items-center justify-center py-16 text-sm text-subtext">
+      Loading…
+    </div>
+  );
+}
 
-const PageLoader = () => (
-  <div className="flex items-center justify-center h-96">
-    <Spinner size={28} />
-  </div>
-);
+export function AppRouter() {
+  const publicRoutes = ROUTES.filter((r) => r.public);
+  const protectedRoutes = ROUTES.filter((r) => !r.public);
 
-export const AppRouter: React.FC = () => (
-  <MainLayout>
-    <Suspense fallback={<PageLoader />}>
+  return (
+    <Suspense fallback={<PageFallback />}>
       <Routes>
-        <Route path="/"               element={<ExceptionDashboard />} />
-        <Route path="/telemetry"      element={<TelemetryPage />} />
-        <Route path="/exceptions"     element={<ExceptionsListPage />} />
-        <Route path="/exceptions/:id" element={<ExceptionDetailPage />} />
-        <Route path="/playbooks"      element={<PlaybooksPage />} />
-        <Route path="/actions"        element={<CorrectiveActionsPage />} />
-        <Route path="/escalations"    element={<EscalationTimelinePage />} />
-        <Route path="/chat"           element={<ConversationalOpsPage />} />
-        <Route path="/reports"        element={<ReportsPage />} />
-        {/* catch-all */}
-        <Route path="*"               element={<Navigate to="/" replace />} />
+        {publicRoutes.map((r) => {
+          const C = r.component;
+          return <Route key={r.path} path={r.path} element={<C />} />;
+        })}
+
+        <Route
+          element={
+            <PrivateRoute>
+              <AppShell />
+            </PrivateRoute>
+          }
+        >
+          {protectedRoutes.map((r) => {
+            const C = r.component;
+            const element = r.roles ? (
+              <PrivateRoute roles={r.roles}>
+                <C />
+              </PrivateRoute>
+            ) : (
+              <C />
+            );
+            return <Route key={r.path} path={r.path} element={element} />;
+          })}
+        </Route>
+
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
-  </MainLayout>
-);
-
-export default AppRouter;
+  );
+}

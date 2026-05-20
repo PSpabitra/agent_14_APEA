@@ -1,114 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "./tokens.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9ff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f4f5ff;
-  --border: #e2e4f0;
-  --border-subtle: #f0f1f9;
-  --text-primary: #0d0e1a;
-  --text-secondary: #4b5073;
-  --text-muted: #8b8fad;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --accent-muted: #eef2ff;
-  --critical: #dc2626;
-  --critical-bg: #fef2f2;
-  --high: #d97706;
-  --high-bg: #fffbeb;
-  --medium: #ca8a04;
-  --medium-bg: #fefce8;
-  --low: #16a34a;
-  --low-bg: #f0fdf4;
-  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --sidebar-w: 260px;
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-bg text-text;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  * {
+    border-color: rgb(var(--color-border));
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--color-border));
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--color-subtext));
+  }
 }
-
-.dark {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-card: #1a1a26;
-  --bg-card-hover: #22223a;
-  --border: #2d2d4e;
-  --border-subtle: #1e1e30;
-  --text-primary: #f0f0ff;
-  --text-secondary: #9b9dc4;
-  --text-muted: #5c5f8a;
-  --accent: #818cf8;
-  --accent-hover: #6366f1;
-  --accent-muted: #1e1b4b;
-  --critical: #f87171;
-  --critical-bg: #2d1515;
-  --high: #fbbf24;
-  --high-bg: #2d2000;
-  --medium: #fde047;
-  --medium-bg: #2d2800;
-  --low: #4ade80;
-  --low-bg: #0d2d18;
-  --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
-}
-
-* { box-sizing: border-box; }
-
-body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  margin: 0;
-}
-
-h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 @layer components {
   .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    @apply bg-surface border border-border rounded-xl shadow-card;
   }
-
-  .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all;
-    background: var(--accent);
-    color: #fff;
+  .focus-ring {
+    @apply outline-none ring-2 ring-offset-2 ring-primary ring-offset-bg;
   }
-  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+}
 
-  .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-    background: transparent;
-  }
-  .btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); }
-
-  .input-field {
-    @apply w-full px-3 py-2 rounded-lg text-sm outline-none transition-all;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-  }
-  .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
-  .input-field::placeholder { color: var(--text-muted); }
-
-  .badge-critical { background: var(--critical-bg); color: var(--critical); }
-  .badge-high     { background: var(--high-bg);     color: var(--high);     }
-  .badge-medium   { background: var(--medium-bg);   color: var(--medium);   }
-  .badge-low      { background: var(--low-bg);       color: var(--low);      }
-  .badge-base     { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold; }
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.live-dot {
+  animation: pulseDot 1.8s ease-in-out infinite;
 }
