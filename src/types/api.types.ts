@@ -173,3 +173,31 @@ export interface AuditEntry {
   ip?: string | null;
   created_at: string;
 }
+
+export interface GDriveConfig {
+  connector: "gdrive";
+  base_url: string;
+  username: string;
+  project_or_table: string; // folder ID
+  sync_interval: number;
+  enabled: boolean;
+  has_secret: boolean;
+  last_sync_at?: string | null;
+  last_status?: "success" | "partial" | "failed" | "skipped" | null;
+  last_error?: string | null;
+  configured: boolean;
+}
+
+export interface GDriveFile {
+  id: number;
+  drive_file_id: string;
+  name: string;
+  mime_type: string;
+  size?: string | null;
+  modified_time?: string | null;
+  created_time?: string | null;
+  web_view_link?: string | null;
+  owners?: { displayName?: string; emailAddress?: string }[] | null;
+  trashed: boolean;
+  last_synced_at: string;
+}
