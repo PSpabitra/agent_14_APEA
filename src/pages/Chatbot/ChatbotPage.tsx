@@ -47,11 +47,10 @@ export function ChatbotPage() {
 
     try {
       const token = localStorage.getItem(API_CONFIG.tokenStorageKey);
-      const url = `${baseUrl}/chat/stream?token=${encodeURIComponent(token || "")}`;
+      const url = `${baseUrl}/chat/stream?token=${encodeURIComponent(token || "")}&message=${encodeURIComponent(text)}&session_id=${sessionId}`;
       const resp = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-        body: JSON.stringify({ session_id: sessionId, message: text }),
+        method: "GET",
+        headers: { Accept: "text/event-stream" },
       });
       if (!resp.body) throw new Error("No response body");
       const reader = resp.body.getReader();
@@ -98,6 +97,8 @@ export function ChatbotPage() {
                 return next;
               });
             }
+          } else if (event === "session") {
+            console.log("Session established:", payload);
           } else if (event === "error") {
             pushToast({ title: "Stream error", description: payload, variant: "error" });
           }
