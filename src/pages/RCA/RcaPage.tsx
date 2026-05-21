@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { Pagination } from "@/components/shared/Pagination";
 import { Sheet } from "@/components/ui";
 import { deviationApi, rcaApi } from "@/services/api/endpoints";
 import { formatDate, formatNumber } from "@/utils/formatters";
@@ -20,6 +21,8 @@ export function RcaPage() {
   const deviationId = params.get("deviation") ? Number(params.get("deviation")) : null;
   const qc = useQueryClient();
   const pushToast = useUiStore((s) => s.pushToast);
+  const [rcaPage, setRcaPage] = useState(1);
+  const rcaPageSize = 10;
 
   const recentDeviations = useQuery({
     queryKey: ["rca-deviation-list"],
@@ -79,9 +82,15 @@ export function RcaPage() {
 
   const rcaList = useQuery({
     queryKey: ["rca-list"],
-    queryFn: () => rcaApi.list(20),
+    queryFn: () => rcaApi.list(100),
     refetchInterval: 60_000,
   });
+
+  const totalRcaPages = Math.ceil((rcaList.data?.length || 0) / rcaPageSize);
+  const paginatedRcaList = useMemo(() => {
+    const start = (rcaPage - 1) * rcaPageSize;
+    return (rcaList.data || []).slice(start, start + rcaPageSize);
+  }, [rcaList.data, rcaPage, rcaPageSize]);
 
   const generateMut = useMutation({
     mutationFn: (id: number) => rcaApi.generate(id),
@@ -308,14 +317,21 @@ export function RcaPage() {
       )}
 
       <Card title="Recent RCA records">
-        <DataTable
-          columns={rcaListCols}
-          rows={rcaList.data || []}
-          rowKey={(r) => r.id}
-          isLoading={rcaList.isLoading}
-          onRowClick={(r) => setSelectedRca(r)}
-          empty="No RCA generated yet."
-        />
+        <div className="flex flex-col gap-0 border border-border rounded-xl overflow-hidden shadow-sm">
+          <DataTable
+            columns={rcaListCols}
+            rows={paginatedRcaList}
+            rowKey={(r) => r.id}
+            isLoading={rcaList.isLoading}
+            onRowClick={(r) => setSelectedRca(r)}
+            empty="No RCA generated yet."
+          />
+          <Pagination
+            currentPage={rcaPage}
+            totalPages={totalRcaPages}
+            onPageChange={setRcaPage}
+          />
+        </div>
       </Card>
       <Sheet
         open={!!selectedRca}

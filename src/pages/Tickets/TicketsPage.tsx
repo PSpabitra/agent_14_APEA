@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ExternalLink, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { Pagination } from "@/components/shared/Pagination";
 import { ticketApi } from "@/services/api/endpoints";
 import { formatDate } from "@/utils/formatters";
 import { useUiStore } from "@/store/slices/ui";
@@ -26,12 +27,25 @@ export function TicketsPage() {
   const pushToast = useUiStore((s) => s.pushToast);
   const [systemFilter, setSystemFilter] = useState<"" | "jira" | "servicenow">("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [ticketPage, setTicketPage] = useState(1);
+  const ticketPageSize = 15;
 
   const list = useQuery({
     queryKey: ["tickets", systemFilter],
     queryFn: () => ticketApi.list({ system: systemFilter || undefined, limit: 200 }),
     refetchInterval: 30_000,
   });
+
+  const totalTicketPages = Math.ceil((list.data?.length || 0) / ticketPageSize);
+  const paginatedTickets = useMemo(() => {
+    const start = (ticketPage - 1) * ticketPageSize;
+    return (list.data || []).slice(start, start + ticketPageSize);
+  }, [list.data, ticketPage, ticketPageSize]);
+
+  // Reset page on filter change
+  useMemo(() => {
+    setTicketPage(1);
+  }, [systemFilter]);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<NewTicketForm>({
     defaultValues: { system: "jira", priority: "Medium", summary: "", description: "" },
@@ -91,11 +105,11 @@ export function TicketsPage() {
     <PageWrapper
       title="Tickets"
       description="Synced from Jira & ServiceNow every 60s"
-      // actions={
-      //   <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalOpen(true)}>
-      //     Create ticket
-      //   </Button>
-      // }
+    // actions={
+    //   <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalOpen(true)}>
+    //     Create ticket
+    //   </Button>
+    // }
     >
       <Card>
         <div className="mb-3 flex items-center gap-3">
@@ -113,13 +127,20 @@ export function TicketsPage() {
             ))}
           </div>
         </div>
-        <DataTable
-          columns={columns}
-          rows={list.data || []}
-          rowKey={(r) => `${r.system}-${r.external_id}`}
-          isLoading={list.isLoading}
-          empty="No tickets yet. Configure a connector and trigger a sync."
-        />
+        <div className="flex flex-col gap-0 border border-border rounded-xl overflow-hidden shadow-sm">
+          <DataTable
+            columns={columns}
+            rows={paginatedTickets}
+            rowKey={(r) => `${r.system}-${r.external_id}`}
+            isLoading={list.isLoading}
+            empty="No tickets yet. Configure a connector and trigger a sync."
+          />
+          <Pagination
+            currentPage={ticketPage}
+            totalPages={totalTicketPages}
+            onPageChange={setTicketPage}
+          />
+        </div>
       </Card>
 
       <Modal

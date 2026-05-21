@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { Pagination } from "@/components/shared/Pagination";
 import { deviationApi } from "@/services/api/endpoints";
 import { formatDate, formatNumber } from "@/utils/formatters";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -40,6 +41,8 @@ export function ExceptionsPage() {
   const [status, setStatus] = useState<"" | DeviationStatus>("open");
   const [search, setSearch] = useState("");
   const debounced = useDebounce(search, 250);
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
 
   const list = useQuery({
     queryKey: ["deviations", severity, status],
@@ -55,13 +58,25 @@ export function ExceptionsPage() {
     const rows = list.data || [];
     if (!debounced) return rows;
     const q = debounced.toLowerCase();
-    return rows.filter((r) =>
-      r.plant.toLowerCase().includes(q) ||
-      r.line.toLowerCase().includes(q) ||
-      r.metric.toLowerCase().includes(q) ||
-      String(r.id).includes(q),
+    return rows.filter(
+      (r) =>
+        r.plant.toLowerCase().includes(q) ||
+        r.line.toLowerCase().includes(q) ||
+        r.metric.toLowerCase().includes(q) ||
+        String(r.id).includes(q),
     );
   }, [list.data, debounced]);
+
+  // Reset to page 1 when search or filters change
+  useMemo(() => {
+    setPage(1);
+  }, [debounced, severity, status]);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paginatedData = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
 
   const updateMut = useMutation({
     mutationFn: ({ id, next }: { id: number; next: DeviationStatus }) => deviationApi.updateStatus(id, next),
@@ -141,14 +156,21 @@ export function ExceptionsPage() {
         </div>
       </Card>
 
-      <DataTable
-        columns={columns}
-        rows={filtered}
-        rowKey={(r) => r.id}
-        isLoading={list.isLoading}
-        onRowClick={(r) => navigate(`/rca?deviation=${r.id}`)}
-        empty="No deviations match the current filters."
-      />
+      <div className="flex flex-col gap-0 border border-border rounded-xl overflow-hidden shadow-sm">
+        <DataTable
+          columns={columns}
+          rows={paginatedData}
+          rowKey={(r) => r.id}
+          isLoading={list.isLoading}
+          onRowClick={(r) => navigate(`/rca?deviation=${r.id}`)}
+          empty="No deviations match the current filters."
+        />
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      </div>
     </PageWrapper>
   );
 }
