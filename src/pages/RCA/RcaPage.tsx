@@ -29,6 +29,40 @@ export function RcaPage() {
     enabled: !!deviationId,
   });
 
+  const deviation = detail.data?.deviation;
+  const latestRca = detail.data?.rca;
+
+  const parsedHypotheses = useMemo(() => {
+    if (!latestRca?.hypotheses) return [];
+    if (typeof latestRca.hypotheses === "string") {
+      try {
+        return JSON.parse(latestRca.hypotheses) as Array<{
+          rank: number;
+          cause: string;
+          evidence: string;
+          confidence: number;
+        }>;
+      } catch (e) {
+        console.error("Failed to parse hypotheses:", e);
+        return [];
+      }
+    }
+    return latestRca.hypotheses;
+  }, [latestRca?.hypotheses]);
+
+  const parsedRecommendedActions = useMemo(() => {
+    if (!latestRca?.recommended_actions) return [];
+    if (typeof latestRca.recommended_actions === "string") {
+      try {
+        return JSON.parse(latestRca.recommended_actions) as string[];
+      } catch (e) {
+        console.error("Failed to parse recommended actions:", e);
+        return [];
+      }
+    }
+    return latestRca.recommended_actions;
+  }, [latestRca?.recommended_actions]);
+
   const rcaList = useQuery({
     queryKey: ["rca-list"],
     queryFn: () => rcaApi.list(20),
@@ -92,15 +126,15 @@ export function RcaPage() {
 
   return (
     <PageWrapper title="Root Cause Analysis" description="AI-assisted hypothesis ranking with retrieval grounding">
-      {deviationId && detail.data ? (
+      {deviationId && deviation ? (
         <div className="space-y-4">
           <Card
-            title={`Deviation #${detail.data.id}`}
-            description={`${detail.data.plant} / ${detail.data.line} — ${detail.data.metric}`}
+            title={`Deviation #${deviation.id}`}
+            description={`${deviation.plant} / ${deviation.line} — ${deviation.metric}`}
             action={
               <Button
                 leftIcon={<Wand2 className="h-4 w-4" />}
-                onClick={() => generateMut.mutate(detail.data!.id)}
+                onClick={() => generateMut.mutate(deviation.id)}
                 isLoading={generateMut.isPending}
               >
                 Generate RCA
@@ -110,34 +144,34 @@ export function RcaPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <p className="text-xs text-subtext">Expected</p>
-                <p className="font-mono text-lg">{formatNumber(detail.data.expected_value)}</p>
+                <p className="font-mono text-lg">{formatNumber(deviation.expected_value)}</p>
               </div>
               <div>
                 <p className="text-xs text-subtext">Actual</p>
-                <p className="font-mono text-lg text-text">{formatNumber(detail.data.actual_value)}</p>
+                <p className="font-mono text-lg text-text">{formatNumber(deviation.actual_value)}</p>
               </div>
               <div>
                 <p className="text-xs text-subtext">Confidence</p>
-                <p className="font-mono text-lg">{(detail.data.confidence_score * 100).toFixed(0)}%</p>
+                <p className="font-mono text-lg">{(deviation.confidence_score * 100).toFixed(0)}%</p>
               </div>
               <div>
                 <p className="text-xs text-subtext">Status</p>
                 <Badge tone="warning" className="capitalize">
-                  {detail.data.status}
+                  {deviation.status}
                 </Badge>
               </div>
             </div>
           </Card>
 
-          {detail.data.latest_rca ? (
+          {latestRca ? (
             <Card title="AI analysis" action={<Brain className="h-5 w-5 text-primary" />}>
-              <p className="text-sm text-text whitespace-pre-wrap">{detail.data.latest_rca.summary}</p>
+              <p className="text-sm text-text whitespace-pre-wrap">{latestRca.summary}</p>
 
               <h4 className="mt-5 mb-2 text-sm font-semibold text-text flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-warning" /> Ranked hypotheses
               </h4>
               <div className="space-y-2">
-                {detail.data.latest_rca.hypotheses.map((h) => (
+                {parsedHypotheses.map((h) => (
                   <div key={h.rank} className="rounded-lg border border-border bg-muted/30 p-3">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-text">
@@ -152,7 +186,7 @@ export function RcaPage() {
 
               <h4 className="mt-5 mb-2 text-sm font-semibold text-text">Recommended actions</h4>
               <ul className="space-y-1">
-                {detail.data.latest_rca.recommended_actions.map((a, i) => (
+                {parsedRecommendedActions.map((a, i) => (
                   <li key={i} className="text-sm text-text flex gap-2">
                     <span className="text-subtext">•</span>
                     <span>{a}</span>
@@ -160,7 +194,7 @@ export function RcaPage() {
                 ))}
               </ul>
 
-              <p className="mt-4 text-xs text-subtext">Generated {formatDate(detail.data.latest_rca.created_at)}</p>
+              <p className="mt-4 text-xs text-subtext">Generated {formatDate(latestRca.created_at)}</p>
             </Card>
           ) : (
             <Card>

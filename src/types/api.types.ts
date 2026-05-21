@@ -67,8 +67,9 @@ export interface Deviation {
   notes?: string | null;
 }
 
-export interface DeviationDetail extends Deviation {
-  latest_rca?: RcaRecord | null;
+export interface DeviationDetail {
+  deviation: Deviation;
+  rca: RcaRecord | null;
 }
 
 export interface TelemetryEvent {
@@ -96,9 +97,9 @@ export interface Ticket {
 export interface RcaRecord {
   id: number;
   deviation_id: number;
-  hypotheses: { rank: number; cause: string; evidence: string; confidence: number }[];
+  hypotheses: { rank: number; cause: string; evidence: string; confidence: number }[] | string;
   summary: string;
-  recommended_actions: string[];
+  recommended_actions: string[] | string;
   created_at: string;
 }
 
