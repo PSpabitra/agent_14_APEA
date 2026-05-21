@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Brain, Lightbulb, Wand2, FileText } from "lucide-react";
+import { Brain, Lightbulb, Wand2, FileText, ArrowLeft } from "lucide-react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -13,6 +13,7 @@ import { useUiStore } from "@/store/slices/ui";
 import type { Deviation } from "@/types";
 
 export function RcaPage() {
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const deviationId = params.get("deviation") ? Number(params.get("deviation")) : null;
   const qc = useQueryClient();
@@ -136,7 +137,17 @@ export function RcaPage() {
   );
 
   return (
-    <PageWrapper title="Root Cause Analysis" description="AI-assisted hypothesis ranking with retrieval grounding">
+    <PageWrapper
+      title="Root Cause Analysis"
+      description="AI-assisted hypothesis ranking with retrieval grounding"
+      actions={
+        deviationId ? (
+          <Button variant="outline" size="sm" onClick={() => navigate(-1)} leftIcon={<ArrowLeft className="h-4 w-4" />}>
+            Back
+          </Button>
+        ) : undefined
+      }
+    >
       {deviationId && deviation ? (
         <div className="space-y-4">
           <Card
