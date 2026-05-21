@@ -8,4 +8,6 @@ export { Badge } from "./Badge";
 export type { BadgeProps, BadgeTone } from "./Badge";
 export { Modal } from "./Modal";
 export type { ModalProps } from "./Modal";
-export { ToastViewport } from "./Toast";
+export { Sheet } from "../../components/ui/Sheet";
+export type { SheetProps } from "../../components/ui/Sheet";
+export { ToastViewport } from "../../components/ui/Toast";

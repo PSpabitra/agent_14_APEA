@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Brain, Lightbulb, Wand2, FileText, ArrowLeft } from "lucide-react";
@@ -7,12 +7,14 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { Sheet } from "@/components/ui";
 import { deviationApi, rcaApi } from "@/services/api/endpoints";
 import { formatDate, formatNumber } from "@/utils/formatters";
 import { useUiStore } from "@/store/slices/ui";
 import type { Deviation, RcaRecord } from "@/types";
 
 export function RcaPage() {
+  const [selectedRca, setSelectedRca] = useState<RcaRecord | null>(null);
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const deviationId = params.get("deviation") ? Number(params.get("deviation")) : null;
@@ -311,9 +313,101 @@ export function RcaPage() {
           rows={rcaList.data || []}
           rowKey={(r) => r.id}
           isLoading={rcaList.isLoading}
+          onRowClick={(r) => setSelectedRca(r)}
           empty="No RCA generated yet."
         />
       </Card>
+      <Sheet
+        open={!!selectedRca}
+        onClose={() => setSelectedRca(null)}
+        title={`RCA Detail #${selectedRca?.id}`}
+        description={`Deviation #${selectedRca?.deviation_id}`}
+        size="lg"
+      >
+        {selectedRca && (
+          <div className="space-y-6">
+            <section>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-subtext mb-2">Root Cause Summary</h4>
+              <div className="rounded-lg border border-border bg-muted/20 p-4 text-sm text-text whitespace-pre-wrap leading-relaxed">
+                {selectedRca.root_cause || selectedRca.summary}
+              </div>
+            </section>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-[10px] font-semibold uppercase text-subtext mb-1">Confidence</p>
+                <p className="font-mono text-lg text-primary">
+                  {selectedRca.confidence ? `${(selectedRca.confidence * 100).toFixed(0)}%` : "-"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border p-3">
+                <p className="text-[10px] font-semibold uppercase text-subtext mb-1">Generated</p>
+                <p className="text-sm text-text">{selectedRca.created_at}</p>
+              </div>
+            </div>
+
+            {selectedRca.hypotheses && (
+              <section>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-subtext mb-2 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-warning" /> Analysis Output
+                </h4>
+                <div className="space-y-3">
+                  {typeof selectedRca.hypotheses === "string" ? (
+                    <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-text whitespace-pre-wrap leading-relaxed">
+                      {selectedRca.hypotheses}
+                    </div>
+                  ) : (
+                    Array.isArray(selectedRca.hypotheses) &&
+                    selectedRca.hypotheses.map((h: any) => (
+                      <div key={h.rank} className="rounded-lg border border-border bg-muted/30 p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium text-text">
+                            #{h.rank}. {h.cause}
+                          </p>
+                          <Badge tone="info">{(h.confidence * 100).toFixed(0)}%</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-subtext">{h.evidence}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+
+            {selectedRca.recommended_actions && (
+              <section>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-subtext mb-2">Recommended Actions</h4>
+                <ul className="space-y-2">
+                  {(typeof selectedRca.recommended_actions === "string"
+                    ? [selectedRca.recommended_actions]
+                    : selectedRca.recommended_actions
+                  ).map((a, i) => (
+                    <li key={i} className="text-sm text-text flex gap-3 p-2 rounded-md hover:bg-muted/30 transition-colors">
+                      <span className="text-primary font-bold mt-0.5">•</span>
+                      <span>{a}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {selectedRca.evidence && Array.isArray(selectedRca.evidence) && selectedRca.evidence.length > 0 && (
+              <section>
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-subtext mb-2">Grounding Evidence</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedRca.evidence.map((ev: any, i: number) => (
+                    <Badge key={i} tone="neutral" className="flex items-center gap-1.5 text-[10px] py-1 px-2.5">
+                      <FileText className="h-3 w-3 text-subtext" />
+                      <span className="max-w-[200px] truncate">{ev.filename}</span>
+                      <span className="text-subtext ml-1 opacity-70">({(ev.score * 100).toFixed(0)}%)</span>
+                    </Badge>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )}
+      </Sheet>
     </PageWrapper>
   );
 }
