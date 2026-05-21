@@ -132,13 +132,13 @@ export function RcaPage() {
           );
         },
       },
-      {
-        key: "conf",
-        header: "Confidence",
-        cell: (r) => (r.confidence ? <span className="text-xs">{(r.confidence * 100).toFixed(0)}%</span> : "-"),
-        width: "100px",
-        align: "center",
-      },
+      // {
+      //   key: "conf",
+      //   header: "Confidence",
+      //   cell: (r) => (r.confidence ? <span className="text-xs">{(r.confidence * 100).toFixed(0)}%</span> : "-"),
+      //   width: "100px",
+      //   align: "center",
+      // },
       {
         key: "when",
         header: "Generated",
