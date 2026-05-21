@@ -35,7 +35,7 @@ export function ChatbotPage() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
 
-  const baseUrl = useMemo(() => (import.meta.env.VITE_API_URL || "/api/v1").replace(/\/$/, ""), []);
+  const baseUrl = useMemo(() => (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/$/, ""), []);
 
   const sendStream = async () => {
     const text = input.trim();
