@@ -229,12 +229,12 @@ export function RcaPage() {
                   <span className="font-semibold">Generated:</span>
                   <span>{latestRca.created_at}</span>
                 </div>
-                {latestRca.confidence && (
+                {/* {latestRca.confidence && (
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold">Confidence:</span>
                     <span className="text-primary font-mono">{(latestRca.confidence * 100).toFixed(0)}%</span>
                   </div>
-                )}
+                )} */}
               </div>
 
               <p className="text-sm text-text whitespace-pre-wrap">{latestRca.root_cause || latestRca.summary}</p>
