@@ -229,16 +229,16 @@ export function ChatbotPage() {
             <Sparkles className="h-4 w-4 text-primary" /> Indexed documents
           </h4>
           <ul className="space-y-1.5 text-sm">
-            {(Array.isArray(docs.data) ? docs.data : []).map((d: any) => (
+            {(Array.isArray(docs.data?.documents) ? docs.data.documents : []).map((d: any) => (
               <li key={d.id} className="flex items-center gap-2 text-text">
                 <FileText className="h-3.5 w-3.5 text-subtext" />
                 <span className="truncate">{d.filename}</span>
-                <Badge tone="neutral" className="ml-auto">
-                  {d.chunks} chunks
+                <Badge tone={d.status === "failed" ? "danger" : "neutral"} className="ml-auto">
+                  {d.status === "failed" ? "failed" : `${d.chunk_count} chunks`}
                 </Badge>
               </li>
             ))}
-            {!docs.isLoading && (docs.data?.length || 0) === 0 && (
+            {!docs.isLoading && (docs.data?.documents?.length || 0) === 0 && (
               <li className="text-xs text-subtext">No documents yet.</li>
             )}
           </ul>

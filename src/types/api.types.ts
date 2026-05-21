@@ -97,8 +97,10 @@ export interface Ticket {
 export interface RcaRecord {
   id: number;
   deviation_id: number;
-  hypotheses: { rank: number; cause: string; evidence: string; confidence: number }[] | string;
+  hypotheses: string | any[];
   summary: string;
+  evidence?: string | any[];
+  generated_by?: string;
   recommended_actions: string[] | string;
   created_at: string;
 }
@@ -145,9 +147,19 @@ export interface ChatMessage {
 export interface UploadedDocument {
   id: number;
   filename: string;
-  source: string;
-  chunks: number;
-  uploaded_at: string;
+  doc_type: string;
+  chunk_count: number;
+  status: string;
+  created_at: string;
+}
+
+export interface RagDocumentsResponse {
+  documents: UploadedDocument[];
+  stats: {
+    count: number;
+    name: string;
+    path: string;
+  };
 }
 
 export interface AuditEntry {

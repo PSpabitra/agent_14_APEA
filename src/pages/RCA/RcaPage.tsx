@@ -33,35 +33,46 @@ export function RcaPage() {
   const latestRca = detail.data?.rca;
 
   const parsedHypotheses = useMemo(() => {
-    if (!latestRca?.hypotheses) return [];
-    if (typeof latestRca.hypotheses === "string") {
+    if (!latestRca?.hypotheses) return null;
+    let data = latestRca.hypotheses;
+    if (typeof data === "string") {
       try {
-        return JSON.parse(latestRca.hypotheses) as Array<{
-          rank: number;
-          cause: string;
-          evidence: string;
-          confidence: number;
-        }>;
-      } catch (e) {
-        console.error("Failed to parse hypotheses:", e);
-        return [];
+        data = JSON.parse(data);
+      } catch {
+        return data;
       }
     }
-    return latestRca.hypotheses;
+    if (Array.isArray(data) && data.length === 1 && typeof data[0] === "string") {
+      return data[0]; // Markdown block
+    }
+    return data;
   }, [latestRca?.hypotheses]);
 
   const parsedRecommendedActions = useMemo(() => {
     if (!latestRca?.recommended_actions) return [];
-    if (typeof latestRca.recommended_actions === "string") {
+    let data = latestRca.recommended_actions;
+    if (typeof data === "string") {
       try {
-        return JSON.parse(latestRca.recommended_actions) as string[];
-      } catch (e) {
-        console.error("Failed to parse recommended actions:", e);
+        data = JSON.parse(data);
+      } catch {
+        return [data];
+      }
+    }
+    return Array.isArray(data) ? data : [];
+  }, [latestRca?.recommended_actions]);
+
+  const parsedEvidence = useMemo(() => {
+    if (!latestRca?.evidence) return [];
+    let data = latestRca.evidence;
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch {
         return [];
       }
     }
-    return latestRca.recommended_actions;
-  }, [latestRca?.recommended_actions]);
+    return Array.isArray(data) ? data : [];
+  }, [latestRca?.evidence]);
 
   const rcaList = useQuery({
     queryKey: ["rca-list"],
@@ -168,31 +179,57 @@ export function RcaPage() {
               <p className="text-sm text-text whitespace-pre-wrap">{latestRca.summary}</p>
 
               <h4 className="mt-5 mb-2 text-sm font-semibold text-text flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-warning" /> Ranked hypotheses
+                <Lightbulb className="h-4 w-4 text-warning" /> Analysis Output
               </h4>
-              <div className="space-y-2">
-                {parsedHypotheses.map((h) => (
-                  <div key={h.rank} className="rounded-lg border border-border bg-muted/30 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-text">
-                        #{h.rank}. {h.cause}
-                      </p>
-                      <Badge tone="info">{(h.confidence * 100).toFixed(0)}%</Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-subtext">{h.evidence}</p>
+              <div className="space-y-3">
+                {typeof parsedHypotheses === "string" ? (
+                  <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-text whitespace-pre-wrap leading-relaxed shadow-sm">
+                    {parsedHypotheses}
                   </div>
-                ))}
+                ) : (
+                  Array.isArray(parsedHypotheses) &&
+                  parsedHypotheses.map((h: any) => (
+                    <div key={h.rank} className="rounded-lg border border-border bg-muted/30 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-text">
+                          #{h.rank}. {h.cause}
+                        </p>
+                        <Badge tone="info">{(h.confidence * 100).toFixed(0)}%</Badge>
+                      </div>
+                      <p className="mt-1 text-xs text-subtext">{h.evidence}</p>
+                    </div>
+                  ))
+                )}
               </div>
 
-              <h4 className="mt-5 mb-2 text-sm font-semibold text-text">Recommended actions</h4>
-              <ul className="space-y-1">
-                {parsedRecommendedActions.map((a, i) => (
-                  <li key={i} className="text-sm text-text flex gap-2">
-                    <span className="text-subtext">•</span>
-                    <span>{a}</span>
-                  </li>
-                ))}
-              </ul>
+              {parsedEvidence.length > 0 && (
+                <>
+                  <h4 className="mt-5 mb-2 text-sm font-semibold text-text">Grounding Evidence</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {parsedEvidence.map((ev, i) => (
+                      <Badge key={i} tone="neutral" className="flex items-center gap-1 text-[10px] py-0.5 px-2">
+                        <FileText className="h-3 w-3 text-subtext" />
+                        <span className="max-w-[150px] truncate">{ev.filename}</span>
+                        <span className="text-subtext ml-1 opacity-70">({(ev.score * 100).toFixed(0)}%)</span>
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {parsedRecommendedActions.length > 0 && (
+                <>
+                  <h4 className="mt-5 mb-2 text-sm font-semibold text-text">Recommended actions</h4>
+                  <ul className="space-y-1">
+                    {parsedRecommendedActions.map((a, i) => (
+                      <li key={i} className="text-sm text-text flex gap-2">
+                        <span className="text-subtext">•</span>
+                        <span>{a}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
               <p className="mt-4 text-xs text-subtext">Generated {formatDate(latestRca.created_at)}</p>
             </Card>

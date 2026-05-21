@@ -72,7 +72,7 @@ export function TicketsPage() {
         </Badge>
       ),
     },
-    { key: "summary", header: "Summary", cell: (r) => <span className="truncate">{r.summary}</span> },
+    // { key: "summary", header: "Summary", cell: (r) => <span className="truncate">{r.summary}</span> },
     {
       key: "priority",
       header: "Priority",

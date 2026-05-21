@@ -10,6 +10,7 @@ import type {
   LoginResponse,
   NotificationItem,
   RcaRecord,
+  RagDocumentsResponse,
   SeverityBreakdown,
   SlaMetric,
   SyncLog,
@@ -188,7 +189,7 @@ export const ragApi = {
     return unwrap(r.data);
   },
   list: async () => {
-    const r = await apiClient.get<ApiEnvelope<UploadedDocument[]>>("/rag/documents");
+    const r = await apiClient.get<ApiEnvelope<RagDocumentsResponse>>("/rag/documents");
     return unwrap(r.data);
   },
 };
