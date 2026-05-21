@@ -74,15 +74,15 @@ export function ExceptionsPage() {
   });
 
   const columns: Column<Deviation>[] = [
-    { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "80px" },
-    { key: "plant", header: "Plant / Line", cell: (r) => `${r.plant} / ${r.line}` },
-    { key: "metric", header: "Metric", cell: (r) => <span className="capitalize">{r.metric}</span> },
-    { key: "expected", header: "Expected", cell: (r) => <span className="font-mono">{formatNumber(r.expected_value)}</span>, align: "right" },
-    { key: "actual", header: "Actual", cell: (r) => <span className="font-mono text-text">{formatNumber(r.actual_value)}</span>, align: "right" },
-    { key: "conf", header: "Confidence", cell: (r) => <span className="text-xs">{(r.confidence_score * 100).toFixed(0)}%</span>, align: "right" },
-    { key: "severity", header: "Severity", cell: (r) => <Badge tone={SEVERITY_TONE[r.severity]} className="capitalize">{r.severity}</Badge> },
-    { key: "status", header: "Status", cell: (r) => <Badge tone={STATUS_TONE[r.status]} className="capitalize">{r.status}</Badge> },
-    { key: "when", header: "Detected", cell: (r) => formatDate(r.detected_at) },
+    { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "60px" },
+    { key: "plant", header: "Plant / Line", cell: (r) => <span className="truncate block" title={`${r.plant} / ${r.line}`}>{r.plant} / {r.line}</span> },
+    { key: "metric", header: "Metric", cell: (r) => <span className="truncate block capitalize" title={r.metric}>{r.metric}</span> },
+    { key: "expected", header: "Expected", cell: (r) => <span className="font-mono">{formatNumber(r.expected_value)}</span>, align: "right", width: "85px" },
+    { key: "actual", header: "Actual", cell: (r) => <span className="font-mono text-text">{formatNumber(r.actual_value)}</span>, align: "right", width: "85px" },
+    { key: "conf", header: "Confidence", cell: (r) => <span className="text-xs">{(r.confidence_score * 100).toFixed(0)}%</span>, align: "right", width: "85px" },
+    { key: "severity", header: "Severity", cell: (r) => <Badge tone={SEVERITY_TONE[r.severity]} className="capitalize">{r.severity}</Badge>, align: "center", width: "100px" },
+    { key: "status", header: "Status", cell: (r) => <Badge tone={STATUS_TONE[r.status]} className="capitalize">{r.status}</Badge>, align: "center", width: "100px" },
+    { key: "when", header: "Detected", cell: (r) => formatDate(r.detected_at), align: "right", width: "140px" },
     {
       key: "actions",
       header: "",

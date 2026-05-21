@@ -22,7 +22,7 @@ export function DataTable<T>({ columns, rows, rowKey, empty, isLoading, onRowCli
   return (
     <div className="overflow-hidden rounded-xl border border-border">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-border">
+        <table className="w-full table-fixed divide-y divide-border">
           <thead className="bg-muted/50">
             <tr>
               {columns.map((c) => (
@@ -66,7 +66,7 @@ export function DataTable<T>({ columns, rows, rowKey, empty, isLoading, onRowCli
                     <td
                       key={c.key}
                       className={cn(
-                        "px-4 py-3 text-sm text-text",
+                        "px-4 py-3 text-sm text-text align-middle",
                         c.align === "right" && "text-right",
                         c.align === "center" && "text-center",
                       )}

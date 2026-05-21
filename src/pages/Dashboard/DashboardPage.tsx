@@ -54,12 +54,12 @@ export function DashboardPage() {
   const recent = useQuery({ queryKey: ["dash", "recent"], queryFn: () => dashboardApi.recentDeviations(10), refetchInterval: 20_000 });
 
   const recentCols: Column<Deviation>[] = [
-    { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "80px" },
-    { key: "plant", header: "Plant / Line", cell: (r) => `${r.plant} / ${r.line}` },
-    { key: "metric", header: "Metric", cell: (r) => r.metric },
-    { key: "value", header: "Actual", cell: (r) => <span className="font-mono">{formatNumber(r.actual_value)}</span>, align: "right" },
-    { key: "severity", header: "Severity", cell: (r) => <Badge tone={SEVERITY_TONE[r.severity]} className="capitalize">{r.severity}</Badge> },
-    { key: "when", header: "Detected", cell: (r) => formatDate(r.detected_at) },
+    { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "60px" },
+    { key: "plant", header: "Plant / Line", cell: (r) => <span className="truncate block" title={`${r.plant} / ${r.line}`}>{r.plant} / {r.line}</span> },
+    { key: "metric", header: "Metric", cell: (r) => <span className="truncate block capitalize" title={r.metric}>{r.metric}</span> },
+    { key: "value", header: "Actual", cell: (r) => <span className="font-mono">{formatNumber(r.actual_value)}</span>, align: "right", width: "90px" },
+    { key: "severity", header: "Severity", cell: (r) => <Badge tone={SEVERITY_TONE[r.severity]} className="capitalize">{r.severity}</Badge>, align: "center", width: "110px" },
+    { key: "when", header: "Detected", cell: (r) => formatDate(r.detected_at), align: "right", width: "160px" },
   ];
 
   const severityData = severity.data?.map((s) => ({ name: s.severity, value: s.count, fill: SEVERITY_COLORS[s.severity] })) || [];

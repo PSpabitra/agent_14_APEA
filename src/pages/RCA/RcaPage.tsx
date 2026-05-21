@@ -10,7 +10,7 @@ import { DataTable, type Column } from "@/components/shared/DataTable";
 import { deviationApi, rcaApi } from "@/services/api/endpoints";
 import { formatDate, formatNumber } from "@/utils/formatters";
 import { useUiStore } from "@/store/slices/ui";
-import type { Deviation } from "@/types";
+import type { Deviation, RcaRecord } from "@/types";
 
 export function RcaPage() {
   const navigate = useNavigate();
@@ -92,12 +92,13 @@ export function RcaPage() {
       pushToast({ title: "RCA generation failed", description: err.message, variant: "error" }),
   });
 
-  const rcaListCols: Column<{ id: number; deviation_id: number; summary: string; created_at: string }>[] = useMemo(
+  const rcaListCols: Column<RcaRecord>[] = useMemo(
     () => [
-      { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "80px" },
+      { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs">#{r.id}</span>, width: "60px" },
       {
         key: "dev",
         header: "Deviation",
+        width: "100px",
         cell: (r) => (
           <button
             onClick={() => setParams({ deviation: String(r.deviation_id) })}
@@ -107,8 +108,33 @@ export function RcaPage() {
           </button>
         ),
       },
-      { key: "summary", header: "Summary", cell: (r) => <span className="truncate">{r.summary}</span> },
-      { key: "when", header: "Generated", cell: (r) => formatDate(r.created_at) },
+      {
+        key: "summary",
+        header: "Summary",
+        align: "center",
+        cell: (r) => {
+          const content = r.root_cause || r.summary || "";
+          return (
+            <span className="truncate block text-xs overflow-hidden" title={content}>
+              {content}
+            </span>
+          );
+        },
+      },
+      {
+        key: "conf",
+        header: "Confidence",
+        cell: (r) => (r.confidence ? <span className="text-xs">{(r.confidence * 100).toFixed(0)}%</span> : "-"),
+        width: "100px",
+        align: "center",
+      },
+      {
+        key: "when",
+        header: "Generated",
+        cell: (r) => r.created_at,
+        width: "180px",
+        align: "right",
+      },
     ],
     [setParams],
   );
@@ -187,7 +213,20 @@ export function RcaPage() {
 
           {latestRca ? (
             <Card title="AI analysis" action={<Brain className="h-5 w-5 text-primary" />}>
-              <p className="text-sm text-text whitespace-pre-wrap">{latestRca.summary}</p>
+              <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border pb-4 text-xs text-subtext">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold">Generated:</span>
+                  <span>{latestRca.created_at}</span>
+                </div>
+                {latestRca.confidence && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold">Confidence:</span>
+                    <span className="text-primary font-mono">{(latestRca.confidence * 100).toFixed(0)}%</span>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-sm text-text whitespace-pre-wrap">{latestRca.root_cause || latestRca.summary}</p>
 
               <h4 className="mt-5 mb-2 text-sm font-semibold text-text flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-warning" /> Analysis Output
@@ -242,7 +281,7 @@ export function RcaPage() {
                 </>
               )}
 
-              <p className="mt-4 text-xs text-subtext">Generated {formatDate(latestRca.created_at)}</p>
+              <p className="mt-4 text-xs text-subtext">Generated {latestRca.created_at}</p>
             </Card>
           ) : (
             <Card>
@@ -269,12 +308,7 @@ export function RcaPage() {
       <Card title="Recent RCA records">
         <DataTable
           columns={rcaListCols}
-          rows={(rcaList.data || []).map((r) => ({
-            id: r.id,
-            deviation_id: r.deviation_id,
-            summary: r.summary,
-            created_at: r.created_at,
-          }))}
+          rows={rcaList.data || []}
           rowKey={(r) => r.id}
           isLoading={rcaList.isLoading}
           empty="No RCA generated yet."

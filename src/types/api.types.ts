@@ -97,11 +97,13 @@ export interface Ticket {
 export interface RcaRecord {
   id: number;
   deviation_id: number;
-  hypotheses: string | any[];
-  summary: string;
+  root_cause: string;
+  confidence?: number;
+  summary?: string;
+  hypotheses?: string | any[];
   evidence?: string | any[];
   generated_by?: string;
-  recommended_actions: string[] | string;
+  recommended_actions?: string[] | string;
   created_at: string;
 }
 
