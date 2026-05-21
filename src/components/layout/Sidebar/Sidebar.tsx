@@ -1,32 +1,26 @@
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
-  AlertTriangle,
-  Ticket,
-  Brain,
-  PlugZap,
-  MessagesSquare,
-  FileText,
-  Settings as SettingsIcon,
-  Database,
+  LayoutDashboard, AlertTriangle, Ticket, Brain,
+  PlugZap, MessagesSquare, FileText, Settings as SettingsIcon,
+  Database, HardDriveDownload,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useUiStore } from "@/store/slices/ui";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/exceptions", label: "Exceptions", icon: AlertTriangle },
-  { to: "/tickets", label: "Tickets", icon: Ticket },
-  { to: "/rca", label: "Root Cause", icon: Brain },
-  { to: "/connectors", label: "Connectors", icon: PlugZap },
-  { to: "/chatbot", label: "Assistant", icon: MessagesSquare },
-  { to: "/reports", label: "Reports", icon: FileText },
-  { to: "/settings", label: "Settings", icon: SettingsIcon },
+  { to: "/dashboard",     label: "Dashboard",     icon: LayoutDashboard },
+  { to: "/exceptions",    label: "Exceptions",    icon: AlertTriangle },
+  { to: "/tickets",       label: "Tickets",       icon: Ticket },
+  { to: "/rca",           label: "Root Cause",    icon: Brain },
+  { to: "/connectors",    label: "Connectors",    icon: PlugZap },
+  { to: "/ftp-connector", label: "FTP Connector", icon: HardDriveDownload },
+  { to: "/chatbot",       label: "Assistant",     icon: MessagesSquare },
+  { to: "/reports",       label: "Reports",       icon: FileText },
+  { to: "/settings",      label: "Settings",      icon: SettingsIcon },
 ];
 
 export function Sidebar() {
   const open = useUiStore((s) => s.sidebarOpen);
-
   return (
     <aside
       className={cn(
