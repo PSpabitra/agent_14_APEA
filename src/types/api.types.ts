@@ -24,14 +24,15 @@ export interface LoginResponse {
 }
 
 export interface DashboardStats {
-  total_events: number;
-  open_deviations: number;
-  open_tickets: number;
-  rca_generated: number;
-  critical_count: number;
-  high_count: number;
-  medium_count: number;
-  low_count: number;
+  telemetry_24h: number;
+  deviations_open: number;
+  deviations_total: number;
+  tickets_open: number;
+  critical_open: number;
+  rca_generated?: number;
+  high_count?: number;
+  medium_count?: number;
+  low_count?: number;
 }
 
 export interface SeverityBreakdown {

@@ -56,7 +56,7 @@ export const dashboardApi = {
     return unwrap(r.data);
   },
   severity: async () => {
-    const r = await apiClient.get<ApiEnvelope<SeverityBreakdown[]>>("/dashboard/severity-breakdown");
+    const r = await apiClient.get<ApiEnvelope<SeverityBreakdown[]>>("/dashboard/severity");
     return unwrap(r.data);
   },
   timeseries: async (hours = 24) => {
@@ -64,7 +64,7 @@ export const dashboardApi = {
     return unwrap(r.data);
   },
   sla: async () => {
-    const r = await apiClient.get<ApiEnvelope<SlaMetric[]>>("/dashboard/sla-metrics");
+    const r = await apiClient.get<ApiEnvelope<SlaMetric[]>>("/dashboard/sla");
     return unwrap(r.data);
   },
   recentDeviations: async (limit = 10) => {

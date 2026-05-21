@@ -91,11 +91,11 @@ export function TicketsPage() {
     <PageWrapper
       title="Tickets"
       description="Synced from Jira & ServiceNow every 60s"
-      actions={
-        <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalOpen(true)}>
-          Create ticket
-        </Button>
-      }
+      // actions={
+      //   <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalOpen(true)}>
+      //     Create ticket
+      //   </Button>
+      // }
     >
       <Card>
         <div className="mb-3 flex items-center gap-3">

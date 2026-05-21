@@ -67,15 +67,15 @@ export function DashboardPage() {
   return (
     <PageWrapper title="Operations Overview" description="Real-time production exception monitoring">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Telemetry events" value={formatNumber(stats.data?.total_events ?? 0, 0)} icon={<Activity className="h-5 w-5" />} />
+        <StatCard label="Telemetry events" value={formatNumber(stats.data?.telemetry_24h ?? 0, 0)} icon={<Activity className="h-5 w-5" />} />
         <StatCard
           label="Open deviations"
-          value={formatNumber(stats.data?.open_deviations ?? 0, 0)}
-          hint={`${stats.data?.critical_count ?? 0} critical, ${stats.data?.high_count ?? 0} high`}
+          value={formatNumber(stats.data?.deviations_open ?? 0, 0)}
+          hint={`${stats.data?.critical_open ?? 0} critical, ${stats.data?.deviations_total ?? 0} total`}
           icon={<AlertTriangle className="h-5 w-5" />}
-          tone={(stats.data?.critical_count ?? 0) > 0 ? "danger" : (stats.data?.high_count ?? 0) > 0 ? "warning" : "default"}
+          tone={(stats.data?.critical_open ?? 0) > 0 ? "danger" : "default"}
         />
-        <StatCard label="Open tickets" value={formatNumber(stats.data?.open_tickets ?? 0, 0)} icon={<TicketIcon className="h-5 w-5" />} tone="info" />
+        <StatCard label="Open tickets" value={formatNumber(stats.data?.tickets_open ?? 0, 0)} icon={<TicketIcon className="h-5 w-5" />} tone="info" />
         <StatCard label="RCA generated" value={formatNumber(stats.data?.rca_generated ?? 0, 0)} icon={<Brain className="h-5 w-5" />} tone="success" />
       </div>
 
